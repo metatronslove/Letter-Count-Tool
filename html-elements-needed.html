@@ -1,0 +1,123 @@
+<div id="spell-count-checker">
+	<textarea id='textentry' placeholder='' name='textentry' class='textentry' autocorrect='off' autocapitalize='off' spellcheck='false' tabindex='0'></textarea>
+	<p class="spellcounter">
+		<label for="letterschs" class="sereflilabel" style="display: none;"></label>
+		<input id="letterschs" name="letterschs" class="spellselect" value='' type="text" title="">
+	</p>
+	<div class="spellcounterelement">
+		<p class="spellcounter">
+			<label style="display: none;" for="spelllanguage" turkishcontent="" englishcontent="" class="sereflilabel"></label>
+			<select id="spelllanguage" name="spelllanguage" class="" title="">
+				<option value="english" turkishcontent="English" englishcontent="English">English</option>
+				<option value="turkish" selected turkishcontent="Türkçe" englishcontent="Türkçe">Türkçe</option>
+			</select>
+		</p>
+		<p class="spellcounter">
+			<label for="linelength" style="display: none;" turkishcontent="" englishcontent=""></label>
+			<input title="" id="linelength" name="linelength" class="spellselect" value=60 type="number" min=40 max=80 step=1 defaultmin="40" defaultmax="80">
+		<section id="limitlinelength" title="" class="checkslidersup">
+			<div class="checkbox-slider">
+				<input type="checkbox" id="limit-linelength" name="limit-linelength">
+				<label for="limit-linelength"></label>
+			</div>
+		</section>
+		</p>
+		<p class="spellcounter">
+			<label for="pagelength" style="display: none;" turkishcontent="" englishcontent=""></label>
+			<input title="" id="pagelength" name="pagelength" class="spellselect" value=30 type="number" min=20 max=40 step=1 defaultmin="20" defaultmax="40">
+		<section id="limitpagelength" title="" class="checkslidersup">
+			<div class="checkbox-slider">
+				<input type="checkbox" id="limit-pagelength" name="limit-pagelength">
+				<label for="limit-pagelength"></label>
+			</div>
+		</section>
+		</p>
+	</div>
+	<p></p>
+	<h2 turkishcontent="İki yana yaslanmış metin çıktısı" englishcontent="Justified text output"></h2>
+	<div id="inverter-buttons" class="spellcounterelement checkslidersdown">
+		<label style="display: none;" for="spellinverter" turkishcontent="" englishcontent="" class="sereflilabel"></label>
+		<p class="spellcounter" name="spellinverter">
+		<section id="invertwords" title="">
+			<div class="checkbox-slider">
+				<input type="checkbox" id="invert-words" name="invert-words">
+				<label for="invert-words"></label>
+			</div>
+		</section>
+		<section id="invertsentences" title="">
+			<div class="checkbox-slider">
+				<input type="checkbox" id="invert-sentences" name="invert-sentences">
+				<label for="invert-sentences"></label>
+			</div>
+		</section>
+		<section id="invertparagraphs" title="">
+			<div class="checkbox-slider">
+				<input type="checkbox" id="invert-paragraphs" name="invert-paragraphs">
+				<label for="invert-paragraphs"></label>
+			</div>
+		</section>
+		<section id="invertwhole" title="">
+			<div class="checkbox-slider">
+				<input type="checkbox" id="invert-whole" name="invert-whole">
+				<label for="invert-whole"></label>
+			</div>
+		</section>
+		</p>
+	</div>
+	<div class="spellcounterelement">
+		<p class="spellcounter">
+			<label style="display: none;" for="pageborders" turkishcontent="" englishcontent="" class="sereflilabel"></label>
+			<select id="pageborders" name="pageborders" class="" title="">
+				<option value=0>┌──────────┘</option>
+				<option value=1>┌┄┄┄┄┄┄┄┄┄┄┘</option>
+				<option value=2>┏┅┅┅┅┅┅┅┅┅┅┛</option>
+				<option value=3>╭──────────╯</option>
+				<option value=4>┏━━━━━━━━━━┛</option>
+				<option value=5>╔══════════╝</option>
+				<option value=6 selected> </option>
+			</select>
+		</p>
+		<p class="spellcounter">
+			<label for="verticalgap" style="display: none;" turkishcontent="" englishcontent=""></label>
+			<input title="" id="verticalgap" name="verticalgap" class="spellselect" value=0 type="number" min=0 max=20 step=1>
+		</p>
+		<p class="spellcounter">
+			<label for="horizantalgap" style="display: none;" turkishcontent="" englishcontent=""></label>
+			<input title="" id="horizantalgap" name="horizantalgap" class="spellselect" value=0 type="number" min=0 max=20 step=1>
+		</p>
+		<p class="spellcounter">
+			<label style="display: none;" for="pagenumbers" turkishcontent="" englishcontent="" class="sereflilabel"></label>
+			<select id="pagenumbers" name="pagenumbers" class="" title="">
+				<option value=0 turkishcontent="Arap Rakamları" englishcontent="Arabic Numerals"></option>
+				<option value=1 turkishcontent="Hint Rakamları" englishcontent="Indian Numerals"></option>
+				<option value=2 turkishcontent="Roma Rakamları" englishcontent="Romen Numerals"></option>
+				<option value=3 turkishcontent="Numaralandırma" englishcontent="Do not number" selected></option>
+			</select>
+		<section id="begin-pagenumbers" title="" class="checkslidersup">
+			<div class="checkbox-slider">
+				<input type="checkbox" id="beginpagenumbers" name="beginpagenumbers">
+				<label for="beginpagenumbers"></label>
+			</div>
+		</section>
+		</p>
+		<p class="spellcounter">
+			<label style="display: none;" for="alignpagenumbersone" turkishcontent="" englishcontent="" class="sereflilabel"></label>
+			<select id="alignpagenumbersone" name="alignpagenumbersone" class="" title="">
+				<option value=0 turkishcontent="Üste" englishcontent="To top"></option>
+				<option value=1 turkishcontent="Alta" englishcontent="To bottom"></option>
+			</select>
+		</p>
+		<p class="spellcounter">
+			<label style="display: none;" for="alignpagenumbers" turkishcontent="" englishcontent="" class="sereflilabel"></label>
+			<select id="alignpagenumbers" name="alignpagenumbers" class="" title="">
+				<option value=0 turkishcontent="Sola yasla" englishcontent="Align left"></option>
+				<option value=1 turkishcontent="Ortala" englishcontent="Center"></option>
+				<option value=2 turkishcontent="Yasla sağa " englishcontent="Align right"></option>
+			</select>
+		</p>
+	</div>
+</div>
+</div>
+<div class="spellresults" id="spellresults"></div>
+<div class="spellresults" id="letterresults"></div>
+<script type="text/javascript" src="lctool.js"></script>

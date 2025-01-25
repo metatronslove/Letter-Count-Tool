@@ -1,0 +1,127 @@
+#textentry,
+#textresult {
+	max-width: 100%;
+	max-height: 60vh;
+	width: 100vw;
+	height: 33vh;
+	font-family: "Dejavu Sans Mono", monospace;
+}
+
+.checkbox-slider {
+	padding-right: .4em;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	-moz-user-select: none;
+	user-select: none
+}
+
+.checkbox-slider [type="checkbox"] {
+	display: none;
+}
+
+.checkbox-slider label {
+	display: block;
+	width: 80px;
+	height: 40px;
+	position: relative;
+	background: rgba(100, 65, 130, 0.5);
+	border-radius: 20px;
+	transition: background 0.2s ease;
+	cursor: pointer;
+	margin: auto auto;
+}
+
+.checkbox-slider label::before {
+	content: '';
+	display: block;
+	width: 50%;
+	height: 100%;
+	background: #ffffff;
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px #d1d1d1;
+	position: absolute;
+	left: 0;
+	top: 0;
+	transition: transform 0.2s ease-in-out;
+}
+
+.checkbox-slider [type="checkbox"]:checked~label {
+	background: rgba(65, 130, 30, 0.5);
+}
+
+.checkbox-slider [type="checkbox"]:checked~label::before {
+	-webkit-transform: translateX(100%);
+	transform: translateX(100%);
+}
+
+.checkslidersup {
+	margin-top: 1.5em;
+	vertical-align: middle;
+}
+
+.checkslidersdown {
+	margin-top: .5em;
+	vertical-align: middle;
+}
+
+#pageborders,
+#pageborders option {
+	font-family: "Dejavu Sans Mono", monospace;
+}
+
+.spellcounterelement {
+	display: inline-flex;
+}
+
+select,
+select option,
+input[type="number"],
+.sereflilabel {
+	min-height: 40px;
+	line-height: 40px;
+	height: 40px;
+	font-family: "Dejavu Sans Mono", monospace;
+}
+
+input[type="text"] {
+	max-width: 100%;
+	width: 100%;
+	font-family: "Dejavu Sans Mono", monospace;
+}
+
+.sereflilabel {
+	min-width: 140px;
+	max-width: 240px;
+}
+
+p.lettercountline,
+p.spellcounter {
+	display: inline-block;
+	max-width: 100%;
+	width: 100%;
+	min-height: 40px;
+	line-height: 40px;
+}
+
+#letterresults p.lettercountline input.countline,
+#spellresults p.lettercountline input.countline {
+	display: inline-block;
+	max-width: calc(100% - 140px);
+	width: 100%;
+	min-height: 40px;
+	line-height: 40px;
+	font-family: "Dejavu Sans Mono", monospace;
+}
+
+p.lettercountline label,
+p.lettercountline label span.countlabel {
+	display: inline-block;
+	font-weight: bolder;
+	min-width: 140px;
+	max-width: 140px;
+	width: 100%;
+}
+
+hr {
+	display: none;
+}
