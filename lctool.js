@@ -525,7 +525,7 @@ function shapeit(theentry, lines, pages) {
 				linespaces = 0;
 				ordinaries = 0;
 				thenewpage += thenewline + theentry[k];
-				if (sagelength < pages) {
+				if (sagelength < pages - 1) {
 					thenewline = '';
 					sagelength++;
 					allolength++;
@@ -545,10 +545,10 @@ function shapeit(theentry, lines, pages) {
 				if (thenewlinelength(thenewline) < 1) {
 					if (thenewlinelength(theentry) - thenewlinelength(theentry.substring(0, k)) <= lines) {
 						thenewpage += theentry.substring(k, theentry.length);
-						if (sagelength == pages) {
+						if (sagelength == pages - 1) {
 							thenewpage += "\n\n"
 							sagelength = 0;
-						} else if (sagelength < pages) {
+						} else if (sagelength < pages - 1) {
 							thenewpage += "\n"
 							sagelength++;
 							allolength++;
@@ -661,10 +661,10 @@ function shapeit(theentry, lines, pages) {
 						thenewpage += thynewline.substring(the_real_c, thynewline.length);
 						thenewline = thenewline.substring(thenewline.length - 1, thenewline.length).trim();
 					}
-					if (sagelength == pages) {
+					if (sagelength == pages - 1) {
 						thenewpage += "\n\n"
 						sagelength = 0;
-					} else if (sagelength < pages) {
+					} else if (sagelength < pages - 1) {
 						thenewpage += "\n"
 						sagelength++;
 						allolength++;
