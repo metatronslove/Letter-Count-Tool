@@ -842,7 +842,7 @@ function largest(mainArray) {
 }
 
 function countnow() {
-	let entry = jQuery('#textentry').val().replace(/\u200B\u200A\u2006\u2009\u2008\u2005\u2004\u2007\u2002\u2003\u2800+/g, ' ');
+	let entry = jQuery('#textentry').val().replace(/\u200B|\u200A|\u2006|\u2009|\u2008|\u2005|\u2004|\u2007|\u2002|\u2003|\u2800+/g, ' ');
 	let linel = parseFloat(jQuery('#linelength').val());
 	let pagel = parseFloat(pagelength(jQuery('#pagelength').attr('unlimited')));
 	let moldmade = `<textarea id='textresult' readonly autocorrect='off' autocapitalize='off' spellcheck='false' tabindex='0'></textarea>
