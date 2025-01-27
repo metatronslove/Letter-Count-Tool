@@ -21,6 +21,50 @@ function pagelength(unlimited) {
 	}
 }
 
+function limitlinelength() {
+	let defaultmin = parseFloat(jQuery('#linelength').attr('defaultmin'));
+	let defaultmax = parseFloat(jQuery('#linelength').attr('defaultmax'));
+	if (jQuery("#linelength")[0].hasAttribute('min') || jQuery("#linelength")[0].hasAttribute('max')) {
+		jQuery("#linelength").removeAttr('min');
+		jQuery("#linelength").removeAttr('max');
+	} else {
+		if (parseFloat(jQuery('#linelength').val()) > defaultmax) {
+			jQuery('#linelength').val(String(defaultmax));
+		} else if (parseFloat(jQuery('#linelength').val()) < defaultmin) {
+			jQuery('#linelength').val(String(defaultmin));
+		}
+		jQuery('#linelength')[0].setAttribute('min', String(defaultmin));
+		jQuery('#linelength')[0].setAttribute('max', String(defaultmax));
+	}
+}
+
+function limitpagelength() {
+	let pagelengthelement = document.getElementById('limit-pagelength');
+	let defaultmin = parseFloat(jQuery('#pagelength').attr('defaultmin'));
+	let defaultmax = parseFloat(jQuery('#pagelength').attr('defaultmax'));
+	if (pagelengthelement.checked) {
+		jQuery('#pagelength')[0].setAttribute('min', pagelength(jQuery('#pagelength').attr('unlimited')));
+		jQuery('#pagelength')[0].setAttribute('max', pagelength(jQuery('#pagelength').attr('unlimited')));
+		if (parseFloat(jQuery('#pagelength').val()) != parseFloat(pagelength(jQuery('#pagelength').attr('unlimited')))) {
+			jQuery('#pagelength').val(pagelength(jQuery('#pagelength').attr('unlimited')));
+		}
+		EnableDisable('pagenumbers', [], ['0', '1', '2'], ['3']);
+		EnableDisable('alignpagenumbersone', [], ['0', '1'], []);
+		EnableDisable('alignpagenumbers', [], ['0', '1', '2'], []);
+	} else {
+		if (parseFloat(jQuery('#pagelength').val()) > defaultmax) {
+			jQuery('#pagelength').val(String(defaultmax));
+		} else if (parseFloat(jQuery('#pagelength').val()) < defaultmin) {
+			jQuery('#pagelength').val(String(defaultmin));
+		}
+		jQuery('#pagelength')[0].setAttribute('min', String(defaultmin));
+		jQuery('#pagelength')[0].setAttribute('max', String(defaultmax));
+		EnableDisable('pagenumbers', ['0', '1', '2'], [], []);
+		EnableDisable('alignpagenumbersone', ['0', '1'], [], []);
+		EnableDisable('alignpagenumbers', ['0', '1', '2'], [], []);
+	}
+}
+
 function saf(metinsaf, ayrac, shadda) {
 	var safmetin, irun, choosen, counter, s, c;
 	safmetin = "";
@@ -493,10 +537,10 @@ function boxandnumberit(shaped, lines, pages) {
 			boxed[2] += "\n";
 			boxed[0] += boxed[2];
 			xob[6] += 1;
-		}
-		return boxed[0];
+		}		
+		jQuery('#textresult').val(boxed[0]);
 	} else {
-		return shaped;
+		jQuery('#textresult').val(shaped);
 	}
 }
 
@@ -708,7 +752,7 @@ function shapeit(theentry, lines, pages) {
 		EnableDisable('alignpagenumbersone', ['0', '1'], [], []);
 		EnableDisable('alignpagenumbers', ['0', '1', '2'], [], []);
 	}
-	return boxandnumberit(shapeoutthat, lines, pages);
+	return shapeoutthat;
 }
 
 function goeson(previousregister, actualregister) {
@@ -717,6 +761,31 @@ function goeson(previousregister, actualregister) {
 	} else {
 		return false;
 	}
+}
+
+function getWhole() {
+	let attribute_name = '';
+	if (document.getElementById('invert-words').checked) {
+		attribute_name += "I";
+	} else {
+		attribute_name += "O";
+	}
+	if (document.getElementById('invert-sentences').checked) {
+		attribute_name += "I";
+	} else {
+		attribute_name += "O";
+	}
+	if (document.getElementById('invert-paragraphs').checked) {
+		attribute_name += "I";
+	} else {
+		attribute_name += "O";
+	}
+	if (document.getElementById('invert-whole').checked) {
+		attribute_name += "I";
+	} else {
+		attribute_name += "O";
+	}
+	jQuery("#textentry")[0].setAttribute('whole', shapeit(String(document.getElementById('textentry').getAttribute(attribute_name)), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val())));
 }
 
 function countthatword(regtype) {
@@ -760,8 +829,18 @@ function superreverse(text, regtype) {
 	return reversetext;
 }
 
-function applychanges(text, regtype) {
-	if (document.getElementById("invert-words").checked || document.getElementById("invert-sentences").checked || document.getElementById("invert-paragraphs").checked) {
+function applychanges(text, regtype, invert) {
+	let mademold = '';
+	if (invert) {
+		if (countthatword(regtype)) {
+			if (!document.getElementById('wordscounts')) {
+				mademold = `<p class="lettercountline">
+				<label for="wordscounts"><span class="countlabel" turkishcontent="Kelimeler" englishcontent="Words">Kelimeler</span></label><input readonly id="wordscounts" name="wordscounts" class="countline" type="number" value="0">
+				</p>`;
+				jQuery("#spellresults").append(mademold);
+			}
+			jQuery('#wordscounts').val(parseFloat(jQuery('#wordscounts').val()) + 1);
+		}
 		if (regtype == 'rubbish') {
 			return '';
 		} else {
@@ -841,8 +920,7 @@ function largest(mainArray) {
 	return Math.max.apply(null, mainArray)
 }
 
-function countnow() {
-	let entry = jQuery('#textentry').val().replace(/\u200B|\u200A|\u2006|\u2009|\u2008|\u2005|\u2004|\u2007|\u2002|\u2003|\u2800+/g, ' ');
+function countnow(entry) {
 	let linel = parseFloat(jQuery('#linelength').val());
 	let pagel = parseFloat(pagelength(jQuery('#pagelength').attr('unlimited')));
 	let moldmade = `<textarea id='textresult' readonly autocorrect='off' autocapitalize='off' spellcheck='false' tabindex='0'></textarea>
@@ -874,6 +952,34 @@ function countnow() {
 	let previousreg = '';
 	let sentenceready = false;
 	let paragraphready = false;
+	let word_sentences = '';
+	let word_inverted_sentences = '';
+	let word_sentences_inverted = '';
+	let word_inverted_sentences_inverted = '';
+	let word_sentences_paragraph = '';
+	let word_inverted_sentences_paragraph = '';
+	let word_sentences_inverted_paragraph = '';
+	let word_inverted_sentences_inverted_paragraph = '';
+	let word_sentences_paragraph_inverted = '';
+	let word_inverted_sentences_paragraph_inverted = '';
+	let word_sentences_inverted_paragraph_inverted = '';
+	let word_inverted_sentences_inverted_paragraph_inverted = '';
+	let word_sentences_paragraph_whole = '';
+	let word_inverted_sentences_paragraph_whole = '';
+	let word_sentences_inverted_paragraph_whole = '';
+	let word_inverted_sentences_inverted_paragraph_whole = '';
+	let word_sentences_paragraph_inverted_whole = '';
+	let word_inverted_sentences_paragraph_inverted_whole = '';
+	let word_sentences_inverted_paragraph_inverted_whole = '';
+	let word_inverted_sentences_inverted_paragraph_inverted_whole = '';
+	let word_sentences_paragraph_whole_inverted = '';
+	let word_inverted_sentences_paragraph_whole_inverted = '';
+	let word_sentences_inverted_paragraph_whole_inverted = '';
+	let word_inverted_sentences_inverted_paragraph_whole_inverted = '';
+	let word_sentences_paragraph_inverted_whole_inverted = '';
+	let word_inverted_sentences_paragraph_inverted_whole_inverted = '';
+	let word_sentences_inverted_paragraph_inverted_whole_inverted = '';
+	let word_inverted_sentences_inverted_paragraph_inverted_whole_inverted = '';
 	jQuery("#spellresults").html("");
 	jQuery("#letterresults").html("");
 	if (jQuery('#textentry').val() != '') {
@@ -1001,117 +1107,161 @@ function countnow() {
 					word += entry[i];
 				}
 				if (i == entry.length - 1) {
-					wordout = applychanges(word, previousreg);
+					wordout = applychanges(word, previousreg, false);
+					wordout_inverted = applychanges(word, previousreg, true)
 					word = '';
 				}
 			} else {
 				if (i == entry.length - 1) {
 					if (regtype != "parais") {
-						wordout = applychanges(word, previousreg);
+						wordout = applychanges(word, previousreg, false);
+						wordout_inverted = applychanges(word, previousreg, true)
 						wordout += entry[i];
 					}
 				} else {
-					wordout = applychanges(word, previousreg);
+					wordout = applychanges(word, previousreg, false);
+					wordout_inverted = applychanges(word, previousreg, true)
 					word = entry[i];
 				}
 			}
 			if (wordout != '' || previousreg == "parais") {
 				if (previousreg == "enders" || previousreg == "endlin" || i == entry.length - 1) {
-					if (document.getElementById("invert-sentences").checked || document.getElementById("invert-paragraphs").checked) {
-						if (previousreg == "endlin") {
-							sentences += wordout;
-						} else if (previousreg == "ofelse") {
-							sentences += wordout;
-						} else if (previousreg == "parais") {
-							sentences += wordout;
-						} else {
-							sentences = wordout + sentences;
-						}
-						wordout = '';
-						sentenceready = true;
+					if (previousreg == "endlin") {
+						word_sentences_inverted += wordout;
+						word_inverted_sentences_inverted += wordout_inverted;
+					} else if (previousreg == "ofelse") {
+						word_sentences_inverted += wordout;
+						word_inverted_sentences_inverted += wordout_inverted;
+					} else if (previousreg == "parais") {
+						word_sentences_inverted += wordout;
+						word_inverted_sentences_inverted += wordout_inverted;
 					} else {
-						sentences += wordout;
-						wordout = '';
-						sentenceready = true;
+						word_sentences_inverted = wordout + word_sentences_inverted;
+						word_inverted_sentences_inverted = wordout_inverted + word_inverted_sentences_inverted;
 					}
+					word_sentences += wordout;
+					word_inverted_sentences += wordout_inverted;
+					wordout_inverted = '';
+					wordout = '';
+					sentenceready = true;
 				} else {
-					if (document.getElementById("invert-sentences").checked || document.getElementById("invert-paragraphs").checked) {
-						if (previousreg == "ofelse") {
-							sentences += wordout;
-						} else if (previousreg == "parais") {
-							sentences += wordout;
-						} else {
-							sentences = wordout + sentences;
-						}
-						wordout = '';
-						sentenceready = false;
+					if (previousreg == "ofelse") {
+						word_sentences_inverted += wordout;
+						word_inverted_sentences_inverted += wordout_inverted;
+					} else if (previousreg == "parais") {
+						word_sentences_inverted += wordout;
+						word_inverted_sentences_inverted += wordout_inverted;
 					} else {
-						sentences += wordout;
-						wordout = '';
-						sentenceready = false;
+						word_sentences_inverted = wordout + word_sentences_inverted;
+						word_inverted_sentences_inverted = wordout_inverted + word_inverted_sentences_inverted;
 					}
+					word_sentences += wordout;
+					word_inverted_sentences += wordout_inverted;
+					wordout_inverted = '';
+					wordout = '';
+					sentenceready = false;
 				}
 			}
 			if (sentenceready) {
 				if (previousreg == "parais" || i == entry.length - 1) {
-					if (document.getElementById("invert-paragraphs").checked) {
-						if (previousreg == "enders") {
-							paragraph += sentences;
-						} else if (previousreg == "endlin") {
-							paragraph += sentences;
-						} else if (previousreg == "parais") {
-							paragraph += sentences;
-						} else {
-							paragraph = sentences + paragraph;
-						}
-						sentences = '';
-						sentenceready = false;
-						paragraphready = true;
+					if (previousreg == "enders") {
+						word_sentences_paragraph_inverted += word_sentences;
+						word_inverted_sentences_paragraph_inverted += word_inverted_sentences;
+						word_sentences_inverted_paragraph_inverted += word_sentences_inverted;
+						word_inverted_sentences_inverted_paragraph_inverted += word_inverted_sentences_inverted;
+					} else if (previousreg == "endlin") {
+						word_sentences_paragraph_inverted += word_sentences;
+						word_inverted_sentences_paragraph_inverted += word_inverted_sentences;
+						word_sentences_inverted_paragraph_inverted += word_sentences_inverted;
+						word_inverted_sentences_inverted_paragraph_inverted += word_inverted_sentences_inverted;
+					} else if (previousreg == "parais") {
+						word_sentences_paragraph_inverted += word_sentences;
+						word_inverted_sentences_paragraph_inverted += word_inverted_sentences;
+						word_sentences_inverted_paragraph_inverted += word_sentences_inverted;
+						word_inverted_sentences_inverted_paragraph_inverted += word_inverted_sentences_inverted;
 					} else {
-						paragraph += sentences;
-						sentences = '';
-						sentenceready = false;
-						paragraphready = true;
+						word_sentences_paragraph_inverted = word_sentences + word_sentences_paragraph_inverted;
+						word_inverted_sentences_paragraph_inverted = word_inverted_sentences + word_inverted_sentences_paragraph_inverted;
+						word_sentences_inverted_paragraph_inverted = word_sentences_inverted + word_sentences_inverted_paragraph_inverted;
+						word_inverted_sentences_inverted_paragraph_inverted = word_inverted_sentences_inverted + word_inverted_sentences_inverted_paragraph_inverted;
 					}
+					word_sentences_paragraph += word_sentences;
+					word_inverted_sentences_paragraph += word_inverted_sentences;
+					word_sentences_inverted_paragraph += word_sentences_inverted;
+					word_inverted_sentences_inverted_paragraph += word_inverted_sentences_inverted;
+					word_sentences = '';
+					word_inverted_sentences = '';
+					word_sentences_inverted = '';
+					word_inverted_sentences_inverted = '';
+					sentenceready = false;
+					paragraphready = true;
 				} else {
-					if (document.getElementById("invert-paragraphs").checked) {
-						if (previousreg == "enders") {
-							paragraph += sentences;
-						} else if (previousreg == "endlin") {
-							paragraph += sentences;
-						} else if (previousreg == "parais") {
-							paragraph += sentences;
-						} else {
-							paragraph = sentences + paragraph;
-						}
-						sentences = '';
-						sentenceready = false;
-						paragraphready = false;
+					if (previousreg == "enders") {
+						word_sentences_paragraph_inverted += word_sentences;
+						word_inverted_sentences_paragraph_inverted += word_inverted_sentences;
+						word_sentences_inverted_paragraph_inverted += word_sentences_inverted;
+						word_inverted_sentences_inverted_paragraph_inverted += word_inverted_sentences_inverted;
+					} else if (previousreg == "endlin") {
+						word_sentences_paragraph_inverted += word_sentences;
+						word_inverted_sentences_paragraph_inverted += word_inverted_sentences;
+						word_sentences_inverted_paragraph_inverted += word_sentences_inverted;
+						word_inverted_sentences_inverted_paragraph_inverted += word_inverted_sentences_inverted;
 					} else {
-						paragraph += sentences;
-						sentences = '';
-						sentenceready = false;
-						paragraphready = false;
+						word_sentences_paragraph_inverted = word_sentences + word_sentences_paragraph_inverted;
+						word_inverted_sentences_paragraph_inverted = word_inverted_sentences + word_inverted_sentences_paragraph_inverted;
+						word_sentences_inverted_paragraph_inverted = word_sentences_inverted + word_sentences_inverted_paragraph_inverted;
+						word_inverted_sentences_inverted_paragraph_inverted = word_inverted_sentences_inverted + word_inverted_sentences_inverted_paragraph_inverted;
 					}
+					word_sentences_paragraph += word_sentences;
+					word_inverted_sentences_paragraph += word_inverted_sentences;
+					word_sentences_inverted_paragraph += word_sentences_inverted;
+					word_inverted_sentences_inverted_paragraph += word_inverted_sentences_inverted;
+					word_sentences = '';
+					word_inverted_sentences = '';
+					word_sentences_inverted = '';
+					word_inverted_sentences_inverted = '';
+					sentenceready = false;
+					paragraphready = false;
 				}
 			}
 			if (paragraphready) {
 				if (i < entry.length) {
-					whole += paragraph;
-					paragraph = '';
+					word_sentences_paragraph_whole += word_sentences_paragraph;
+					word_inverted_sentences_paragraph_whole += word_inverted_sentences_paragraph;
+					word_sentences_inverted_paragraph_whole += word_sentences_inverted_paragraph;
+					word_inverted_sentences_inverted_paragraph_whole += word_inverted_sentences_inverted_paragraph;
+					word_sentences_paragraph_inverted_whole += word_sentences_paragraph_inverted;
+					word_inverted_sentences_paragraph_inverted_whole += word_inverted_sentences_paragraph_inverted;
+					word_sentences_inverted_paragraph_inverted_whole += word_sentences_inverted_paragraph_inverted;
+					word_inverted_sentences_inverted_paragraph_inverted_whole += word_inverted_sentences_inverted_paragraph_inverted;
+					word_sentences_paragraph = '';
+					word_inverted_sentences_paragraph = '';
+					word_sentences_inverted_paragraph = '';
+					word_inverted_sentences_inverted_paragraph = '';
+					word_sentences_paragraph_inverted = '';
+					word_inverted_sentences_paragraph_inverted = '';
+					word_sentences_inverted_paragraph_inverted = '';
+					word_inverted_sentences_inverted_paragraph_inverted = '';
 					paragraphready = false;
 				}
 			}
-			if (countthatword(previousreg)) {
-				wordis += 1;
-			}
 			if (i == entry.length - 1) {
-				if (document.getElementById("invert-whole").checked) {
-					wholetext = whole.split("").reverse().join("").trim();
-				} else {
-					wholetext = whole.trim();
-				}
-				whole = '';
+				word_sentences_paragraph_whole = word_sentences_paragraph_whole.trim();
+				word_inverted_sentences_paragraph_whole = word_inverted_sentences_paragraph_whole.trim();
+				word_sentences_inverted_paragraph_whole = word_sentences_inverted_paragraph_whole.trim();
+				word_inverted_sentences_inverted_paragraph_whole = word_inverted_sentences_inverted_paragraph_whole.trim();
+				word_sentences_paragraph_inverted_whole = word_sentences_paragraph_inverted_whole.trim();
+				word_inverted_sentences_paragraph_inverted_whole = word_inverted_sentences_paragraph_inverted_whole.trim();
+				word_sentences_inverted_paragraph_inverted_whole = word_sentences_inverted_paragraph_inverted_whole.trim();
+				word_inverted_sentences_inverted_paragraph_inverted_whole = word_inverted_sentences_inverted_paragraph_inverted_whole.trim();
+				word_sentences_paragraph_whole_inverted = word_sentences_paragraph_whole.split("").reverse().join("");
+				word_inverted_sentences_paragraph_whole_inverted = word_inverted_sentences_paragraph_whole.split("").reverse().join("");
+				word_sentences_inverted_paragraph_whole_inverted = word_sentences_inverted_paragraph_whole.split("").reverse().join("");
+				word_inverted_sentences_inverted_paragraph_whole_inverted = word_inverted_sentences_inverted_paragraph_whole.split("").reverse().join("");
+				word_sentences_paragraph_inverted_whole_inverted = word_sentences_paragraph_inverted_whole.split("").reverse().join("");
+				word_inverted_sentences_paragraph_inverted_whole_inverted = word_inverted_sentences_paragraph_inverted_whole.split("").reverse().join("");
+				word_sentences_inverted_paragraph_inverted_whole_inverted = word_sentences_inverted_paragraph_inverted_whole.split("").reverse().join("");
+				word_inverted_sentences_inverted_paragraph_inverted_whole_inverted = word_inverted_sentences_inverted_paragraph_inverted_whole.split("").reverse().join("");
 			}
 			previousreg = regtype;
 			if (jQuery("#letterschs").val() != "") {
@@ -1133,6 +1283,22 @@ function countnow() {
 			}
 		}
 	}
+	jQuery("#textentry")[0].setAttribute('IIII', word_inverted_sentences_inverted_paragraph_inverted_whole_inverted);
+	jQuery("#textentry")[0].setAttribute('IIIO', word_inverted_sentences_inverted_paragraph_inverted_whole);
+	jQuery("#textentry")[0].setAttribute('IOIO', word_inverted_sentences_paragraph_inverted_whole);
+	jQuery("#textentry")[0].setAttribute('IIOO', word_inverted_sentences_inverted_paragraph_whole);
+	jQuery("#textentry")[0].setAttribute('IIOI', word_inverted_sentences_inverted_paragraph_inverted_whole);
+	jQuery("#textentry")[0].setAttribute('IOII', word_inverted_sentences_paragraph_inverted_whole_inverted);
+	jQuery("#textentry")[0].setAttribute('IOOI', word_inverted_sentences_paragraph_whole_inverted);
+	jQuery("#textentry")[0].setAttribute('IOOO', word_inverted_sentences_paragraph_whole);
+	jQuery("#textentry")[0].setAttribute('OIII', word_sentences_inverted_paragraph_inverted_whole_inverted);
+	jQuery("#textentry")[0].setAttribute('OIIO', word_sentences_inverted_paragraph_inverted_whole);
+	jQuery("#textentry")[0].setAttribute('OIOI', word_sentences_inverted_paragraph_whole_inverted);
+	jQuery("#textentry")[0].setAttribute('OIOO', word_sentences_inverted_paragraph_whole);
+	jQuery("#textentry")[0].setAttribute('OOII', word_sentences_paragraph_inverted_whole_inverted);
+	jQuery("#textentry")[0].setAttribute('OOIO', word_sentences_paragraph_inverted_whole);
+	jQuery("#textentry")[0].setAttribute('OOOI', word_sentences_paragraph_whole_inverted);
+	jQuery("#textentry")[0].setAttribute('OOOO', word_sentences_paragraph_whole);
 	if (!(!document.getElementById('arabiccounts') || !document.getElementById('hebrewcounts'))) {
 		if (!(jQuery("#linelength")[0].hasAttribute('disabled'))) {
 			jQuery("#linelength")[0].setAttribute('disabled', 'disabled');
@@ -1159,7 +1325,6 @@ function countnow() {
 		EnableDisable('pageborders', [], ['0', '1', '2', '3', '4', '5'], ['6']);
 		EnableDisable('alignpagenumbersone', [], ['0', '1'], []);
 		EnableDisable('alignpagenumbers', [], ['0', '1', '2'], []);
-		jQuery('#textresult').val(wholetext);
 	} else {
 		if (jQuery("#linelength")[0].hasAttribute('disabled')) {
 			jQuery("#linelength").removeAttr('disabled');
@@ -1186,7 +1351,6 @@ function countnow() {
 		EnableDisable('pageborders', ['0', '1', '2', '3', '4', '5'], [], []);
 		EnableDisable('alignpagenumbersone', ['0', '1'], [], []);
 		EnableDisable('alignpagenumbers', ['0', '1', '2'], [], []);
-		jQuery('#textresult').val(shapeit(wholetext, linel, pagel));
 	}
 }
 
@@ -1289,99 +1453,76 @@ function translateto(language) {
 	jQuery('label[for="wp-comment-cookies-consent"]').html(cookieconsent);
 	jQuery('input#submit')[0].setAttribute('value', sendbutton);
 }
-
 jQuery(document).ready(function() {
 	translateto("turkish");
-	jQuery("#limit-linelength").change(function() {
-		let defaultmin = parseFloat(jQuery('#linelength').attr('defaultmin'));
-		let defaultmax = parseFloat(jQuery('#linelength').attr('defaultmax'));
-		if (jQuery("#linelength")[0].hasAttribute('min') || jQuery("#linelength")[0].hasAttribute('max')) {
-			jQuery("#linelength").removeAttr('min');
-			jQuery("#linelength").removeAttr('max');
-		} else {
-			if (parseFloat(jQuery('#linelength').val()) > defaultmax) {
-				jQuery('#linelength').val(String(defaultmax));
-			} else if (parseFloat(jQuery('#linelength').val()) < defaultmin) {
-				jQuery('#linelength').val(String(defaultmin));
-			}
-			jQuery('#linelength')[0].setAttribute('min', String(defaultmin));
-			jQuery('#linelength')[0].setAttribute('max', String(defaultmax));
-		}
-		countnow();
+	jQuery("#pageborders").change(function() {
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
 	});
-	jQuery("#limit-pagelength").change(function() {
-		let pagelengthelement = document.getElementById('limit-pagelength');
-		let defaultmin = parseFloat(jQuery('#pagelength').attr('defaultmin'));
-		let defaultmax = parseFloat(jQuery('#pagelength').attr('defaultmax'));
-		if (pagelengthelement.checked) {
-			jQuery('#pagelength')[0].setAttribute('min', pagelength(jQuery('#pagelength').attr('unlimited')));
-			jQuery('#pagelength')[0].setAttribute('max', pagelength(jQuery('#pagelength').attr('unlimited')));
-			if (parseFloat(jQuery('#pagelength').val()) != parseFloat(pagelength(jQuery('#pagelength').attr('unlimited')))) {
-				jQuery('#pagelength').val(pagelength(jQuery('#pagelength').attr('unlimited')));
-			}
-			EnableDisable('pagenumbers', [], ['0', '1', '2'], ['3']);
-			EnableDisable('alignpagenumbersone', [], ['0', '1'], []);
-			EnableDisable('alignpagenumbers', [], ['0', '1', '2'], []);
-		} else {
-			if (parseFloat(jQuery('#pagelength').val()) > defaultmax) {
-				jQuery('#pagelength').val(String(defaultmax));
-			} else if (parseFloat(jQuery('#pagelength').val()) < defaultmin) {
-				jQuery('#pagelength').val(String(defaultmin));
-			}
-			jQuery('#pagelength')[0].setAttribute('min', String(defaultmin));
-			jQuery('#pagelength')[0].setAttribute('max', String(defaultmax));
-			EnableDisable('pagenumbers', ['0', '1', '2'], [], []);
-			EnableDisable('alignpagenumbersone', ['0', '1'], [], []);
-			EnableDisable('alignpagenumbers', ['0', '1', '2'], [], []);
-		}
-		countnow();
+	jQuery("#pagenumbers").change(function() {
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
 	});
-	jQuery("#pageborders").on({
-		'change': countnow
+	jQuery("#beginpagenumbers").change(function() {
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
 	});
-	jQuery("#pagenumbers").on({
-		'change': countnow
+	jQuery("#alignpagenumbers").change(function() {
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
 	});
-	jQuery("#beginpagenumbers").on({
-		'change': countnow
+	jQuery("#alignpagenumbersone").change(function() {
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
 	});
-	jQuery("#alignpagenumbers").on({
-		'change': countnow
+	jQuery("#verticalgap").on('input', function() {
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
 	});
-	jQuery("#alignpagenumbersone").on({
-		'change': countnow
-	});
-	jQuery("#invert-words").on({
-		'change': countnow
-	});
-	jQuery("#invert-sentences").on({
-		'change': countnow
-	});
-	jQuery("#invert-paragraphs").on({
-		'change': countnow
-	});
-	jQuery("#invert-whole").on({
-		'change': countnow
-	});
-	jQuery("#letterschs").on({
-		'input': countnow
-	});
-	jQuery("#linelength").on({
-		'input': countnow
-	});
-	jQuery("#pagelength").on({
-		'input': countnow
-	});
-	jQuery("#verticalgap").on({
-		'input': countnow
-	});
-	jQuery("#horizantalgap").on({
-		'input': countnow
+	jQuery("#horizantalgap").on('input', function() {
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
 	});
 	jQuery("select[name='spelllanguage']").change(function() {
 		translateto(jQuery(this).val());
 	});
-	jQuery("#textentry").on({
-		'input': countnow
+	jQuery("#invert-words").change(function() {
+		getWhole();
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
+	});
+	jQuery("#invert-sentences").change(function() {
+		getWhole();
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
+	});
+	jQuery("#invert-paragraphs").change(function() {
+		getWhole();
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
+	});
+	jQuery("#invert-whole").change(function() {
+		getWhole();
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
+	});
+	jQuery("#textentry").on('input', function() {
+		let entry = String(jQuery("#textentry").val()).replace(/\u200B|\u200A|\u2006|\u2009|\u2008|\u2005|\u2004|\u2007|\u2002|\u2003|\u2800+/g, ' ');
+		countnow(entry);
+		getWhole();
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
+	});
+	jQuery("#letterschs").on('input', function() {
+		let entry = String(jQuery("#textentry").val()).replace(/\u200B|\u200A|\u2006|\u2009|\u2008|\u2005|\u2004|\u2007|\u2002|\u2003|\u2800+/g, ' ');
+		countnow(entry);
+		getWhole();
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
+	});
+	jQuery("#linelength").on('input', function() {
+		getWhole();
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
+	});
+	jQuery("#pagelength").on('input', function() {
+		getWhole();
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
+	});
+	jQuery("#limit-linelength").change(function() {
+		limitlinelength();
+		getWhole();
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
+	});
+	jQuery("#limit-pagelength").change(function() {
+		limitpagelength();
+		getWhole();
+		boxandnumberit(String(document.getElementById('textentry').getAttribute('whole')), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()));
 	});
 });
