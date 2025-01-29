@@ -330,7 +330,7 @@ function boxandnumberit(shaped, lines, pages) {
 		parseFloat(document.getElementById('alignpagenumbers').value),
 		0, 1
 	];
-	let boxed = ["", "", "", String(lines), String(pages), "0", "0", ];
+	let boxed = ["", "", "", String(lines), String(pages), "0", "0"];
 	let doxeb = shaped.replace(/\n\n/g, '\n \n').split("\n");
 	let thestyle = parseFloat(document.getElementById('pagenumbers').value);
 	let boxedlines = 0;
@@ -446,9 +446,18 @@ function boxandnumberit(shaped, lines, pages) {
 				}
 				boxed[2] += String(box[xob[0]])[1];
 				boxed[2] += "\n";
-				boxedlines += 1
+				boxedlines += 1;
 			}
-			boxedlines += 1
+			while (String(doxeb[boxedlines]) == " ") {
+				if (boxedlines < doxeb.length - 1) {
+					boxedlines += 1;
+				} else {
+					break;
+				}
+			}
+			if (boxedlines == doxeb.length - 1) {
+				boxedlines += 1;
+			}
 			if (emptystoadd > 0) {
 				for (sidelines = 0; sidelines < parseFloat(boxed[4]) - emptystoadd; sidelines += 1) {
 					boxed[2] += String(box[xob[0]])[1];
