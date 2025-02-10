@@ -331,7 +331,7 @@ function boxandnumberit(shaped, lines, pages) {
 		0, 1
 	];
 	let boxed = ["", "", "", String(lines), String(pages), "0", "0"];
-	let doxeb = String(shaped).replace(/\n\n/g, '\n \n').split("\n");
+	let doxeb = String(shaped  + "\n").replace(/\n\n/g, '\n \n').split("\n");
 	let thestyle = parseFloat(document.getElementById('pagenumbers').value);
 	let boxedlines = 0;
 	let sidespace = 0;
@@ -552,6 +552,7 @@ function boxandnumberit(shaped, lines, pages) {
 		jQuery('#textresult').val(shaped);
 	}
 }
+
 function justifyText(text, lineLength, rowsPerPage) {
     const paragraphs = text.split('\n');
     const allLines = [];
@@ -644,8 +645,7 @@ function justifyText(text, lineLength, rowsPerPage) {
 		EnableDisable('pagenumbers', ['0', '1', '2'], [], []);
 		EnableDisable('alignpagenumbersone', ['0', '1'], [], []);
 		EnableDisable('alignpagenumbers', ['0', '1', '2'], [], []);
-	}
-	
+	}	
     return shapeout; // Use form feed for page separation
 }
 
@@ -679,7 +679,7 @@ function getWhole() {
 	} else {
 		attribute_name += "O";
 	}
-	jQuery("#textentry")[0].setAttribute('whole', justifyText(String(document.getElementById('textentry').getAttribute(attribute_name)), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val())));
+	jQuery("#textentry")[0].setAttribute('whole', String(justifyText(String(document.getElementById('textentry').getAttribute(attribute_name)), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val()))));
 }
 
 function countthatword(regtype) {
@@ -746,20 +746,6 @@ function applychanges(text, regtype, invert) {
 		} else {
 			return text;
 		}
-	}
-}
-
-function thenewlinelength(text) {
-	if (text != null) {
-		let thematch = String(text).replace(/[\u0591-\u05BF\u0610-\u061A\u064B-\u065F\u06C1-\u06C3\u06D6-\u06DC\u06DF-\u06E8\u06EA-\u06ED\u0670]+,/g, "");
-		let lamaleef = thematch.replace(/[لا],/g, "ل");
-		if (thematch != null) {
-			return lamaleef.length
-		} else {
-			return String(text).length
-		}
-	} else {
-		return 0
 	}
 }
 

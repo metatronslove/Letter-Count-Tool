@@ -331,7 +331,7 @@ function boxandnumberit(shaped, lines, pages) {
 		0, 1
 	];
 	let boxed = ["", "", "", String(lines), String(pages), "0", "0"];
-	let doxeb = shaped.replace(/\n\n/g, '\n \n').split("\n");
+	let doxeb = String(shaped  + "\n").replace(/\n\n/g, '\n \n').split("\n");
 	let thestyle = parseFloat(document.getElementById('pagenumbers').value);
 	let boxedlines = 0;
 	let sidespace = 0;
