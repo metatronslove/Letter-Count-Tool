@@ -553,189 +553,74 @@ function boxandnumberit(shaped, lines, pages) {
 	}
 }
 
-function shapeit(theentry, lines, pages) {
-	let allolength = 1;
-	let linelength = 0;
-	let sagelength = 0;
-	let linebreaks = 0;
-	let linespaces = 0;
-	let ordinaries = 0;
-	let beginnings = 0;
-	let ofdistance = 0;
-	let correction = '';
-	let correcteds = [];
-	let thenewpage = '';
-	let thenewline = '';
-	let restofline = '';
-	let shapeoutthat = '';
-	if (theentry != "") {
-		theentry = theentry.replace(/ +/g, ' ');
-		for (let k = 0; k < theentry.length; k += 1) {
-			if (theentry[k] == "\n") {
-				regtype = "linebreaks";
-				linebreaks++;
-				linelength = 0;
-				linespaces = 0;
-				ordinaries = 0;
-				thenewpage += thenewline + theentry[k];
-				if (sagelength < pages - 1) {
-					thenewline = '';
-					sagelength++;
-					allolength++;
-				} else {
-					thenewline = '';
-					sagelength = 0;
-				}
-			} else if (theentry[k] == " ") {
-				regtype = "linespaces";
-				linespaces++;
-				linelength += linespaces;
-				if (thenewline != '') {
-					if (beginnings == 1) {
-						thenewline += theentry[k];
-					}
-				}
-				if (thenewlinelength(thenewline) < 1) {
-					if (thenewlinelength(theentry) - thenewlinelength(theentry.substring(0, k)) <= lines) {
-						thenewpage += theentry.substring(k, theentry.length);
-						if (sagelength == pages - 1) {
-							thenewpage += "\n\n"
-							sagelength = 0;
-						} else if (sagelength < pages - 1) {
-							thenewpage += "\n"
-							sagelength++;
-							allolength++;
-						}
-						break;
-					}
-				}
-			} else {
-				regtype = "ordinaries";
-				ordinaries++;
-				linelength += ordinaries;
-				if (beginnings != 1) {
-					beginnings = 1;
-				}
-				thenewline += theentry[k];
-				if (thenewlinelength(thenewline.trim()) >= lines) {
-					let one = false;
-					let c = 0;
-					while (thenewline[thenewline.length - c] != " ") {
-						if (thenewline.length > c) {
-							c++;
-							one = true;
-						} else {
-							one = false;
-							break;
-						}
-					}
-					if (one) {
-						c--;
-					}
-					ofdistance = (lines + c) - thenewline.length;
-					if (ofdistance >= 1) {
-						let spacelayer = 0;
-						let layers = spacelayer;
-						correcteds = [];
-						if (thenewline.trim().length - c == lines) {
-							correction = thenewline.trim();
-							restofline = '';
-						} else {
-							correction = thenewline.substring(0, thenewline.length - c);
-							restofline = thenewline.substring(thenewline.length - c, thenewline.length);
-						}
-						thenewline = '';
-						correcteds[spacelayer] = correction;
-						let survives = 0;
-						let endofd = true;
-						while (ofdistance >= 0) {
-							layers = spacelayer;
-							if (spacelayer > 0) {
-								correction = correcteds[spacelayer - 1];
-								correcteds[spacelayer - 1] = '';
-							}
-							correcteds[spacelayer] = '';
-							for (let s = 0; s < correction.length; s += 1) {
-								if (correction[s] == " ") {
-									if (s < correction.length - 1) {
-										correcteds[spacelayer] += correction[s];
-									}
-									if (layers == 0) {
-										if (s < correction.length - 1) {
-											correcteds[spacelayer] += " ";
-											ofdistance--;
-											survives = s;
-											if (ofdistance == 0) {
-												endofd = false;
-												break;
-											} else {
-												endofd = true;
-											}
-										}
-									} else if (layers > 0) {
-										layers--;
-									}
-								} else {
-									correcteds[spacelayer] += correction[s];
-									layers = spacelayer;
-								}
-							}
-							if (ofdistance == 0) {
-								break;
-							} else {
-								spacelayer++;
-							}
-						}
-						if (!endofd) {
-							correcteds[spacelayer] += correction.substring(survives, correction.length);
-							thenewpage += correcteds[spacelayer].trim();
-							correcteds[spacelayer] = '';
-						} else if (spacelayer == 1) {
-							correcteds[spacelayer - 1] += correction.substring(survives, correction.length);
-							thenewpage += correcteds[spacelayer - 1].trim();
-							correcteds[spacelayer - 1] = '';
-						}
-						thenewline = restofline;
-						restofline = '';
-						correction = '';
-						correcteds = [];
-					} else {
-						let the_real_c = 0;
-						while (thenewline[the_real_c] != " ") {
-							if (thenewline.length > the_real_c) {
-								the_real_c++;
-							}
-						}
-						let thynewline = thenewline.substring(0, thenewline.length - 1).trim();
-						thenewpage += thynewline.substring(0, the_real_c);
-						for (let komple = 0; komple < lines - thenewlinelength(thynewline); komple += 1) {
-							thenewpage += " ";
-						}
-						thenewpage += thynewline.substring(the_real_c, thynewline.length);
-						thenewline = thenewline.substring(thenewline.length - 1, thenewline.length).trim();
-					}
-					if (sagelength == pages - 1) {
-						thenewpage += "\n\n"
-						sagelength = 0;
-					} else if (sagelength < pages - 1) {
-						thenewpage += "\n"
-						sagelength++;
-						allolength++;
-					}
-				}
-			}
-		}
-		if (thenewlinelength(thenewline.trim().length) <= lines) {
-			thenewpage += thenewline + "\n";
-			thenewline = '';
-			sagelength++;
-			allolength++;
-		}
-		shapeoutthat += thenewpage;
-		thenewpage = '';
-		sagelength = 0;
-	}
-	allolength = shapeoutthat.split("\n").length;
+function justifyText(text, lineLength, rowsPerPage) {
+    const paragraphs = text.split('\n');
+    const allLines = [];
+
+    for (const para of paragraphs) {
+        const words = para.trim().split(/\s+/);
+        if (words.length === 0) continue;
+
+        const lines = [];
+        let currentLine = [];
+        let currentLength = 0;
+
+        // Split paragraph into lines
+        for (const word of words) {
+            const potentialLength = currentLine.length === 0 
+                ? word.length 
+                : currentLength + 1 + word.length;
+
+            if (potentialLength <= lineLength) {
+                currentLine.push(word);
+                currentLength = potentialLength;
+            } else {
+                lines.push(currentLine);
+                currentLine = [word];
+                currentLength = word.length;
+            }
+        }
+        if (currentLine.length > 0) lines.push(currentLine);
+
+        // Justify lines
+        for (let i = 0; i < lines.length; i++) {
+            const lineWords = lines[i];
+            let justifiedLine;
+
+            if (i === lines.length - 1) { // Last line of paragraph
+                justifiedLine = lineWords.join(' ');
+                justifiedLine += ' '.repeat(lineLength - justifiedLine.length);
+            } else {
+                const totalChars = lineWords.reduce((sum, w) => sum + w.length, 0);
+                const totalSpaces = lineLength - totalChars;
+                const gaps = lineWords.length - 1;
+
+                if (gaps === 0) {
+                    justifiedLine = lineWords[0] + ' '.repeat(totalSpaces);
+                } else {
+                    const spacePerGap = Math.floor(totalSpaces / gaps);
+                    const extraSpaces = totalSpaces % gaps;
+                    justifiedLine = '';
+
+                    for (let j = 0; j < lineWords.length; j++) {
+                        justifiedLine += lineWords[j];
+                        if (j < gaps) {
+                            justifiedLine += ' '.repeat(spacePerGap + (j < extraSpaces ? 1 : 0));
+                        }
+                    }
+                }
+            }
+            allLines.push(justifiedLine.trim());
+        }
+    }
+
+    // Split into pages
+    const pages = [];
+    for (let i = 0; i < allLines.length; i += rowsPerPage) {
+        pages.push(allLines.slice(i, i + rowsPerPage).join('\n'));
+    }
+    let shapeout = String(pages.join('\n\n'));
+	let allolength = shapeout.split("\n").length;
 	jQuery('#pagelength')[0].setAttribute('unlimited', String(allolength));
 	let pagelengthelement = document.getElementById('limit-pagelength');
 	let defaultmin = parseFloat(jQuery('#pagelength').attr('defaultmin'));
@@ -761,7 +646,8 @@ function shapeit(theentry, lines, pages) {
 		EnableDisable('alignpagenumbersone', ['0', '1'], [], []);
 		EnableDisable('alignpagenumbers', ['0', '1', '2'], [], []);
 	}
-	return shapeoutthat;
+	
+    return shapeout; // Use form feed for page separation
 }
 
 function goeson(previousregister, actualregister) {
@@ -794,7 +680,7 @@ function getWhole() {
 	} else {
 		attribute_name += "O";
 	}
-	jQuery("#textentry")[0].setAttribute('whole', shapeit(String(document.getElementById('textentry').getAttribute(attribute_name)), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val())));
+	jQuery("#textentry")[0].setAttribute('whole', justifyText(String(document.getElementById('textentry').getAttribute(attribute_name)), parseFloat(jQuery('#linelength').val()), parseFloat(jQuery('#pagelength').val())));
 }
 
 function countthatword(regtype) {
