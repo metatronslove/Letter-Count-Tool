@@ -1149,15 +1149,15 @@ function countnow(entry) {
 				mademold = '';
 				for (let s = 0; s < letrs.length; s += 1) {
 					if (entry[i] == letrs[s]) {
-						if (!document.getElementById('lettercountlinefor' + String(s))) {
+						if (!document.getElementById('lettercountlinefor' + String(letrs[s]))) {
 							mademold = `<p class="lettercountline">
-					<label for="lettercountlinefor${String(s)}"><span class="countlabel">[ ${String(letrs[s])} ]</span></label>
-					<input readonly id="lettercountlinefor${String(s)}" name="lettercountlinefor${String(s)}" class="countline" type="number" value="0">
+					<label for="lettercountlinefor${String(letrs[s])}"><span class="countlabel">[ ${String(letrs[s])} ]</span></label>
+					<input readonly id="lettercountlinefor${String(letrs[s])}" name="lettercountlinefor${String(letrs[s])}" class="countline" type="number" value="0">
 					</p>`;
 							jQuery("#letterresults").append(mademold);
 						}
-						let hillvalley = parseFloat(jQuery('#lettercountlinefor' + String(s)).val());
-						jQuery('#lettercountlinefor' + String(s)).val(hillvalley + 1);
+						let hillvalley = parseFloat(jQuery('#lettercountlinefor' + String(letrs[s])).val());
+						jQuery('#lettercountlinefor' + String(letrs[s])).val(hillvalley + 1);
 					}
 				}
 			}
